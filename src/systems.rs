@@ -10,12 +10,12 @@ const VIEWPORT_RATIO_HEIGHT: f32 = 9.;
 
 const RESOLUTION: (f32, f32) = (1280., 720.);
 
-const VIEWPORT_RELATIVE_WIDTH: f32 = 32.;
-const VIEWPORT_RELATIVE_HEIGHT: f32 = 18.;
+pub const VIEWPORT_RELATIVE_WIDTH: usize = 32;
+pub const VIEWPORT_RELATIVE_HEIGHT: usize = 18;
 
 const SUBUNITS_PER_UNIT: f32 = 20.;
-const WIDTH_IN_SUBUNITS: f32 = VIEWPORT_RELATIVE_WIDTH * SUBUNITS_PER_UNIT;
-const HEIGHT_IN_SUBUNITS: f32 = VIEWPORT_RELATIVE_HEIGHT * SUBUNITS_PER_UNIT;
+const WIDTH_IN_SUBUNITS: f32 = VIEWPORT_RELATIVE_WIDTH as f32 * SUBUNITS_PER_UNIT;
+const HEIGHT_IN_SUBUNITS: f32 = VIEWPORT_RELATIVE_HEIGHT as f32 * SUBUNITS_PER_UNIT;
 
 pub fn setup(mut commands: Commands, mut window_query: Query<&mut Window, With<PrimaryWindow>>) {
     let mut window = window_query.single_mut();
@@ -41,8 +41,8 @@ pub fn setup(mut commands: Commands, mut window_query: Query<&mut Window, With<P
             },
             projection: OrthographicProjection {
                 scaling_mode: bevy::render::camera::ScalingMode::Fixed {
-                    width: VIEWPORT_RELATIVE_WIDTH,
-                    height: VIEWPORT_RELATIVE_HEIGHT,
+                    width: VIEWPORT_RELATIVE_WIDTH as f32,
+                    height: VIEWPORT_RELATIVE_HEIGHT as f32,
                 },
                 ..default()
             },
