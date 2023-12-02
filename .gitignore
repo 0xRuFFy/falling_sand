@@ -1,5 +1,9 @@
+# Rust / Cargo
 debug/
 target/
 Cargo.lock
 **/*.rs.bk
 *.pdb
+
+# ctags
+tags
