@@ -1,4 +1,5 @@
 use crate::components::MainGameCamera;
+use crate::resources::ShowFps;
 use bevy::core_pipeline::clear_color::ClearColorConfig;
 use bevy::prelude::*;
 use bevy::window::{PresentMode, PrimaryWindow, WindowMode};
@@ -29,6 +30,8 @@ pub fn setup(mut commands: Commands, mut window_query: Query<&mut Window, With<P
         (RESOLUTION.1 / HEIGHT_IN_SUBUNITS).round() * HEIGHT_IN_SUBUNITS,
     )
         .into();
+
+    commands.insert_resource(ShowFps(true));
 
     commands.spawn((
         Camera2dBundle {
