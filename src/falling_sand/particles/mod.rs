@@ -6,7 +6,8 @@ use bevy::sprite::Anchor;
 pub use sand::Sand;
 
 pub trait Particle {
-    fn spawn(&self, commands: &mut Commands, position: &Vec2); // TODO: spawn location
+    fn get_type(&self) -> world::Particle;
+    fn spawn(&self, commands: &mut Commands, position: &Vec2);
 }
 
 pub fn base_spawn(commands: &mut Commands, position: &Vec2, particle: world::Particle) {
@@ -14,7 +15,6 @@ pub fn base_spawn(commands: &mut Commands, position: &Vec2, particle: world::Par
         return;
     }
 
-    println!("particle: {:?}", position);
     let position = Vec3::new(position.x, position.y, 0.0);
 
     commands.spawn((

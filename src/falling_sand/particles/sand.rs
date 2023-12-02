@@ -11,6 +11,10 @@ impl Sand {
 }
 
 impl Particle for Sand {
+    fn get_type(&self) -> world::Particle {
+        world::Particle::Sand
+    }
+
     fn spawn(&self, commands: &mut Commands, position: &Vec2) {
         base_spawn(commands, position, world::Particle::Sand);
     }

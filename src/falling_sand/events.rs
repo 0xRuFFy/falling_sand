@@ -9,10 +9,7 @@ pub struct SpawnParticleEvent {
 
 impl SpawnParticleEvent {
     pub fn new(position: Vec2, particle: Particle) -> Self {
-        SpawnParticleEvent {
-            position,
-            particle,
-        }
+        SpawnParticleEvent { position, particle }
     }
 
     pub fn execute(&self, commands: &mut Commands) {
@@ -26,12 +23,14 @@ impl SpawnParticleEvent {
 pub fn spawn_particle(
     mut commands: Commands,
     mut spanw_event: EventReader<SpawnParticleEvent>,
-    world: ResMut<world::World>,
+    mut world: ResMut<world::World>,
 ) {
     for event in spanw_event.read() {
         // TODO: check spawn location
         // TODO: add to quadtree/grid
-        println!("{:?}", event.position);
-        event.execute(&mut commands);
+        if world.is_empty(event.position) {
+            world.insert(event.position, event.particle);
+            event.execute(&mut commands);
+        }
     }
 }
