@@ -1,9 +1,6 @@
-mod sand;
-
 use super::world;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
-pub use sand::Sand;
 
 pub trait Particle {
     fn get_type(&self) -> world::Particle;

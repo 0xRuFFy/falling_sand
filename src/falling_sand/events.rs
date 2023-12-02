@@ -1,3 +1,4 @@
+use super::particles::base_spawn;
 use super::world::{self, Particle};
 use bevy::prelude::*;
 
@@ -9,14 +10,10 @@ pub struct SpawnParticleEvent {
 
 impl SpawnParticleEvent {
     pub fn new(position: Vec2, particle: Particle) -> Self {
-        SpawnParticleEvent { position, particle }
-    }
-
-    pub fn execute(&self, commands: &mut Commands) {
-        if self.particle.is_empty() {
-            return;
+        SpawnParticleEvent {
+            position,
+            particle,
         }
-        self.particle.get().unwrap().spawn(commands, &self.position);
     }
 }
 
@@ -26,11 +23,9 @@ pub fn spawn_particle(
     mut world: ResMut<world::World>,
 ) {
     for event in spanw_event.read() {
-        // TODO: check spawn location
-        // TODO: add to quadtree/grid
         if world.is_empty(event.position) {
             world.insert(event.position, event.particle);
-            event.execute(&mut commands);
+            base_spawn(&mut commands, &event.position, event.particle);
         }
     }
 }

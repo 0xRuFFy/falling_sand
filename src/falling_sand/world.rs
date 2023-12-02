@@ -1,14 +1,15 @@
-use super::particles;
-use bevy::{prelude::*, utils::HashMap};
-use std::sync::Arc;
+use bevy::prelude::*;
+use bevy::utils::HashMap;
 
 const PARTICLE_DEFAULT_COLOR: Color = Color::rgb(0.0, 0.0, 0.0);
 const PARTICLE_SAND_COLOR: Color = Color::rgb(1.0, 0.824, 0.196);
+const PARTICLE_WATER_COLOR: Color = Color::rgb(0.063, 0.459, 0.91);
 
 #[derive(Component, Clone, Copy, PartialEq, Eq)]
 pub enum Particle {
     Empty,
     Sand,
+    Water,
 }
 
 impl Particle {
@@ -21,16 +22,10 @@ impl Particle {
     }
 
     pub fn color(&self) -> Option<Color> {
-        match self {
-            Particle::Empty => None,
-            Particle::Sand => Some(PARTICLE_SAND_COLOR),
-        }
-    }
-
-    pub fn get(&self) -> Option<Box<dyn particles::Particle + Send + Sync>> {
         Some(match self {
             Particle::Empty => return None,
-            Particle::Sand => Box::new(particles::Sand::new()),
+            Particle::Sand => PARTICLE_SAND_COLOR,
+            Particle::Water => PARTICLE_WATER_COLOR,
         })
     }
 
@@ -59,15 +54,41 @@ impl Particle {
 
                 None
             }
+            Particle::Water => {
+                let mut desired_position = Vec2::new(position.x, position.y - 1.0);
+                if world.is_empty(desired_position) {
+                    return Some(desired_position);
+                }
+
+                desired_position.x -= 1.0;
+                if world.is_empty(desired_position) {
+                    return Some(desired_position);
+                }
+
+                desired_position.x += 2.0;
+                if world.is_empty(desired_position) {
+                    return Some(desired_position);
+                }
+
+                desired_position.y += 1.0;
+                if world.is_empty(desired_position) {
+                    return Some(desired_position);
+                }
+
+                desired_position.y -= 2.0;
+                if world.is_empty(desired_position) {
+                    return Some(desired_position);
+                }
+
+                None
+            }
         }
     }
 }
 
-type TParticle = Box<dyn particles::Particle + Send + Sync>;
-
 #[derive(Resource)]
 pub struct World {
-    particles: HashMap<(usize, usize), TParticle>,
+    particles: HashMap<(usize, usize), Particle>,
 }
 
 impl World {
@@ -87,7 +108,7 @@ impl World {
         let x = position.x as usize;
         let y = position.y as usize;
         if let Some(p) = self.particles.get(&(x, y)) {
-            return Some(p.get_type());
+            return Some(p.clone());
         }
         None
     }
@@ -98,7 +119,7 @@ impl World {
         if particle.is_empty() {
             self.particles.remove(&(x, y));
         }
-        self.particles.insert((x, y), particle.get().unwrap());
+        self.particles.insert((x, y), particle);
     }
 
     pub fn update(&mut self, query: &mut Query<(&mut Transform, &mut Particle)>) {

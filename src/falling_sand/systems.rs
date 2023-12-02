@@ -22,14 +22,20 @@ pub fn spawn_particle_mouse(
     mut spawn_event: EventWriter<SpawnParticleEvent>,
     window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
-    if mouse_button_input.pressed(MouseButton::Left) {
-        if let Ok(window) = window_query.get_single() {
-            if let Some(position) = window.cursor_position() {
-                let position = Vec2::new(
-                    (position.x as u32 / PIXELS_PER_UNIT as u32) as f32,
-                    ((window.height() - position.y) as u32 / PIXELS_PER_UNIT as u32) as f32,
-                );
+    if !mouse_button_input.any_pressed([MouseButton::Left, MouseButton::Right]) {
+        return;
+    }
+    if let Ok(window) = window_query.get_single() {
+        if let Some(position) = window.cursor_position() {
+            let position = Vec2::new(
+                (position.x as u32 / PIXELS_PER_UNIT as u32) as f32,
+                ((window.height() - position.y) as u32 / PIXELS_PER_UNIT as u32) as f32,
+            );
+
+            if mouse_button_input.pressed(MouseButton::Left) {
                 spawn_event.send(SpawnParticleEvent::new(position, world::Particle::Sand))
+            } else if mouse_button_input.pressed(MouseButton::Right) {
+                spawn_event.send(SpawnParticleEvent::new(position, world::Particle::Water))
             }
         }
     }

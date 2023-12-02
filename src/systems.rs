@@ -12,7 +12,7 @@ pub fn setup(mut commands: Commands, mut window_query: Query<&mut Window, With<P
     let mut window = window_query.single_mut();
 
     window.title = "Falling Sand".into();
-    window.present_mode = PresentMode::AutoNoVsync;
+    window.present_mode = PresentMode::AutoVsync;
     window.mode = WindowMode::Windowed;
     // GET CLOSEST PIXELPERFECT RESOLUTION TO RESOLUTION
     window.resolution = RESOLUTION.into();
