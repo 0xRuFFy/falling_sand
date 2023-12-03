@@ -24,6 +24,8 @@ pub fn base_spawn(commands: &mut Commands, position: &Vec2, particle: Particle) 
     ));
 }
 
+// TODO: FIX THIS MESS
+
 const PARTICLE_DEFAULT_COLOR: Color = Color::rgb(0.0, 0.0, 0.0);
 const PARTICLE_SAND_COLOR: Color = Color::rgb(1.0, 0.824, 0.196);
 const PARTICLE_WATER_COLOR: Color = Color::rgb(0.063, 0.459, 0.91);
