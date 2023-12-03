@@ -1,5 +1,6 @@
 use super::events::SpawnParticleEvent;
-use super::world::{self, Particle};
+use super::particles::Particle;
+use super::world;
 use crate::systems::PIXELS_PER_UNIT;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -33,9 +34,9 @@ pub fn spawn_particle_mouse(
             );
 
             if mouse_button_input.pressed(MouseButton::Left) {
-                spawn_event.send(SpawnParticleEvent::new(position, world::Particle::Sand))
+                spawn_event.send(SpawnParticleEvent::new(position, Particle::Sand))
             } else if mouse_button_input.pressed(MouseButton::Right) {
-                spawn_event.send(SpawnParticleEvent::new(position, world::Particle::Water))
+                spawn_event.send(SpawnParticleEvent::new(position, Particle::Water))
             }
         }
     }

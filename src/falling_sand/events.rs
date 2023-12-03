@@ -1,5 +1,5 @@
-use super::particles::base_spawn;
-use super::world::{self, Particle};
+use super::particles::{base_spawn, Particle};
+use super::world;
 use bevy::prelude::*;
 
 #[derive(Event)]
@@ -10,10 +10,7 @@ pub struct SpawnParticleEvent {
 
 impl SpawnParticleEvent {
     pub fn new(position: Vec2, particle: Particle) -> Self {
-        SpawnParticleEvent {
-            position,
-            particle,
-        }
+        SpawnParticleEvent { position, particle }
     }
 }
 
