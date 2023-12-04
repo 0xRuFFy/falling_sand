@@ -1,10 +1,11 @@
 use super::particles::Particle;
 use bevy::prelude::*;
 use bevy::utils::HashMap;
+use itertools::Itertools;
 
 #[derive(Resource)]
 pub struct World {
-    particles: HashMap<(usize, usize), Particle>,
+    particles: HashMap<(usize, usize), Entity>,
     ground_level: f32,
 }
 
@@ -19,49 +20,52 @@ impl World {
     pub fn is_empty(&self, position: Vec2) -> bool {
         let x = position.x as usize;
         let y = position.y as usize;
-        self.particles.get(&(x, y)).is_none()
+        self.ground_level <= position.y && self.particles.get(&(x, y)).is_none()
     }
 
-    pub fn get(&self, position: Vec2) -> Option<Particle> {
+    // pub fn get(&self, position: Vec2) -> Option<Particle> {
+    //     let x = position.x as usize;
+    //     let y = position.y as usize;
+    //     if let Some(p) = self.particles.get(&(x, y)) {
+    //         return Some(p.clone());
+    //     }
+    //     None
+    // }
+
+    pub fn insert(&mut self, commands: &mut Commands, position: Vec2, particle: Particle) {
+        if particle.is_empty() || !self.is_empty(position) {
+            return;
+        }
+
         let x = position.x as usize;
         let y = position.y as usize;
-        if let Some(p) = self.particles.get(&(x, y)) {
-            return Some(p.clone());
-        }
-        None
+
+        self.particles
+            .insert((x, y), particle.spawn(commands, &position).unwrap());
     }
 
-    pub fn insert(&mut self, position: Vec2, particle: Particle) {
-        let x = position.x as usize;
-        let y = position.y as usize;
-        if particle.is_empty() {
-            self.particles.remove(&(x, y));
+    fn update_position(&mut self, old_position: Vec2, new_position: Vec2) {
+        if self.is_empty(old_position) || !self.is_empty(new_position) {
+            return;
         }
-        self.particles.insert((x, y), particle);
+        let old = (old_position.x as usize, old_position.y as usize);
+        let new = (new_position.x as usize, new_position.y as usize);
+        let id = self.particles.get(&old).unwrap().clone();
+
+        self.particles.remove(&old);
+        self.particles.insert(new, id);
     }
 
     pub fn update(&mut self, query: &mut Query<(&mut Transform, &mut Particle)>) {
-        let mut changed = Vec::new();
+        for key in self.particles.clone().keys().sorted() {
+            let (mut transform, mut particle) = query.get_mut(self.particles[key]).unwrap();
 
-        for (mut transform, mut particle) in query.iter_mut() {
-            if particle.is_empty() {
-                continue;
-            }
-
-            let position = Vec2::new(transform.translation.x, transform.translation.y);
+            let position = transform.translation.xy();
 
             if let Some(new_position) = particle.update(position, &self) {
-                if position.y > self.ground_level {
-                    transform.translation = new_position.extend(transform.translation.z);
-                    changed.push((position, new_position, particle.clone()));
-                }
+                transform.translation = new_position.extend(transform.translation.z);
+                self.update_position(position, new_position);
             }
-        }
-
-        for (position, new_position, p_type) in changed {
-            self.particles
-                .remove(&(position.x as usize, position.y as usize));
-            self.insert(new_position, p_type);
         }
     }
 }

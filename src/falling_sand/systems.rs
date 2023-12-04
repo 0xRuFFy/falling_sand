@@ -1,7 +1,7 @@
 use super::events::SpawnParticleEvent;
 use super::particles::Particle;
 use super::world;
-use crate::falling_sand::resources::SpawnTimer;
+use crate::falling_sand::resources::{Brush, SpawnTimer};
 use crate::systems::PIXELS_PER_UNIT;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
@@ -9,7 +9,8 @@ use bevy::window::PrimaryWindow;
 pub fn setup(mut commands: Commands) {
     commands.insert_resource(world::World::new(0.0));
     commands.insert_resource(SpawnTimer::default());
-    commands.insert_resource(Time::<Fixed>::from_seconds(0.016))
+    commands.insert_resource(Time::<Fixed>::from_seconds(0.016));
+    commands.insert_resource(Brush::default());
 }
 
 pub fn update(mut spawn_timer: ResMut<SpawnTimer>, time: Res<Time>) {
@@ -40,10 +41,9 @@ pub fn spawn_particle_mouse(
 
             if mouse_button_input.pressed(MouseButton::Left) {
                 spawn_event.send(SpawnParticleEvent::new(position, Particle::Sand))
+            } else if mouse_button_input.pressed(MouseButton::Right) {
+                spawn_event.send(SpawnParticleEvent::new(position, Particle::Water))
             }
-            // else if mouse_button_input.pressed(MouseButton::Right) {
-            //     spawn_event.send(SpawnParticleEvent::new(position, Particle::Water))
-            // }
         }
     }
 }

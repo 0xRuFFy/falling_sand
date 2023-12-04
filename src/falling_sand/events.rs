@@ -1,7 +1,8 @@
 use super::particles::Particle;
 use super::world;
-use crate::falling_sand::resources::SpawnTimer;
+use crate::falling_sand::resources::{Brush, SpawnTimer};
 use bevy::prelude::*;
+use std::ops::Add;
 
 #[derive(Event)]
 pub struct SpawnParticleEvent {
@@ -23,15 +24,19 @@ pub fn spawn_particle(
     mut spawn_event: EventReader<SpawnParticleEvent>,
     mut world: ResMut<world::World>,
     mut spawn_timer: ResMut<SpawnTimer>,
+    brush: Res<Brush>,
 ) {
     for event in spawn_event.read() {
         if !spawn_timer.guard() {
             return;
         }
 
-        if world.is_empty(event.position) {
-            world.insert(event.position, event.particle);
-            event.particle.spawn(&mut commands, &event.position);
+        for offset in brush.get() {
+            let position = event.position.add(*offset);
+            if world.is_empty(position) {
+                world.insert(&mut commands, position, event.particle);
+                // event.particle.spawn(&mut commands, &event.position);
+            }
         }
     }
 }
