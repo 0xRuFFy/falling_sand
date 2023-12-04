@@ -14,7 +14,7 @@ pub fn setup(mut commands: Commands, mut window_query: Query<&mut Window, With<P
     window.title = "Falling Sand".into();
     window.present_mode = PresentMode::AutoVsync;
     window.mode = WindowMode::Windowed;
-    // GET CLOSEST PIXELPERFECT RESOLUTION TO RESOLUTION
+    // GET CLOSEST PIXEL PERFECT RESOLUTION TO RESOLUTION
     window.resolution = RESOLUTION.into();
 
     commands.insert_resource(ShowFps(true));
