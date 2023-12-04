@@ -7,7 +7,7 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 pub fn setup(mut commands: Commands) {
-    commands.insert_resource(world::World::new());
+    commands.insert_resource(world::World::new(0.0));
     commands.insert_resource(SpawnTimer::default());
     commands.insert_resource(Time::<Fixed>::from_seconds(0.016))
 }

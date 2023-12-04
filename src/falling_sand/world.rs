@@ -5,12 +5,14 @@ use bevy::utils::HashMap;
 #[derive(Resource)]
 pub struct World {
     particles: HashMap<(usize, usize), Particle>,
+    ground_level: f32,
 }
 
 impl World {
-    pub fn new() -> Self {
+    pub fn new(ground_level: f32) -> Self {
         World {
             particles: HashMap::new(),
+            ground_level,
         }
     }
 
@@ -49,8 +51,10 @@ impl World {
             let position = Vec2::new(transform.translation.x, transform.translation.y);
 
             if let Some(new_position) = particle.update(position, &self) {
-                transform.translation = new_position.extend(transform.translation.z);
-                changed.push((position, new_position, particle.clone()));
+                if position.y > self.ground_level {
+                    transform.translation = new_position.extend(transform.translation.z);
+                    changed.push((position, new_position, particle.clone()));
+                }
             }
         }
 
