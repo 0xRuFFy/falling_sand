@@ -16,7 +16,10 @@ pub fn update(mut spawn_timer: ResMut<SpawnTimer>, time: Res<Time>) {
     spawn_timer.tick(time)
 }
 
-pub fn fixed_update(mut world: ResMut<world::World>, mut query: Query<(&mut Transform, &mut Particle)>) {
+pub fn fixed_update(
+    mut world: ResMut<world::World>,
+    mut query: Query<(&mut Transform, &mut Particle)>,
+) {
     world.update(&mut query);
 }
 

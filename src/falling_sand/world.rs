@@ -55,7 +55,8 @@ impl World {
         }
 
         for (position, new_position, p_type) in changed {
-            self.particles.remove(&(position.x as usize, position.y as usize));
+            self.particles
+                .remove(&(position.x as usize, position.y as usize));
             self.insert(new_position, p_type);
         }
     }
