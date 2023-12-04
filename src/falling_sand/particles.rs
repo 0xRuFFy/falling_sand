@@ -15,6 +15,12 @@ const PARTICLE_SAND_COLOR: PColor = &[
     Color::rgb(0.878, 0.702, 0.212),
     Color::rgb(0.961, 0.812, 0.392),
 ];
+const PARTICLE_WATER_COLOR: PColor = &[
+    Color::rgb(0.392, 0.49, 0.961),
+    Color::rgb(0.314, 0.322, 0.871),
+    Color::rgb(0.463, 0.471, 0.91),
+    Color::rgb(0.267, 0.278, 0.988),
+];
 
 struct MovementOptionGroup(&'static [Vec2]);
 
@@ -31,10 +37,16 @@ const PARTICLE_SAND_MOVEMENT: PMovement = &[
     MovementOptionGroup(&[Vec2::new(1.0, -1.0), Vec2::new(-1.0, -1.0)]),
 ];
 
-#[derive(Component, Clone, Copy, PartialEq, Eq)]
+const PARTICLE_WATER_MOVEMENT: PMovement = &[
+    MovementOptionGroup(&[Vec2::new(0.0, -1.0)]),
+    MovementOptionGroup(&[Vec2::new(1.0, 0.0), Vec2::new(-1.0, 0.0)]),
+];
+
+#[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Particle {
     Empty,
     Sand,
+    Water,
 }
 
 impl Particle {
@@ -47,6 +59,7 @@ impl Particle {
         match self {
             Particle::Empty => PARTICLE_EMPTY_COLOR,
             Particle::Sand => PARTICLE_SAND_COLOR,
+            Particle::Water => PARTICLE_WATER_COLOR,
         }
         .choose(&mut rng)
     }
@@ -55,27 +68,32 @@ impl Particle {
         match self {
             Particle::Empty => None,
             Particle::Sand => Some(PARTICLE_SAND_MOVEMENT),
+            Particle::Water => Some(PARTICLE_WATER_MOVEMENT),
         }
     }
 
-    pub fn spawn(&self, commands: &mut Commands, position: &Vec2) {
+    pub fn spawn(&self, commands: &mut Commands, position: &Vec2) -> Option<Entity> {
         if self.is_empty() {
-            return;
+            return None;
         }
 
-        commands.spawn((
-            SpriteBundle {
-                sprite: Sprite {
-                    color: *self.color().unwrap_or(PARTICLE_DEFAULT_COLOR),
-                    custom_size: Some(Vec2::new(1.0, 1.0)),
-                    anchor: Anchor::BottomLeft,
-                    ..default()
-                },
-                transform: Transform::from_translation(position.extend(0.0)),
-                ..default()
-            },
-            *self,
-        ));
+        Some(
+            commands
+                .spawn((
+                    SpriteBundle {
+                        sprite: Sprite {
+                            color: *self.color().unwrap_or(PARTICLE_DEFAULT_COLOR),
+                            custom_size: Some(Vec2::new(1.0, 1.0)),
+                            anchor: Anchor::BottomLeft,
+                            ..default()
+                        },
+                        transform: Transform::from_translation(position.extend(0.0)),
+                        ..default()
+                    },
+                    *self,
+                ))
+                .id(),
+        )
     }
 
     pub fn update(&mut self, position: Vec2, world: &world::World) -> Option<Vec2> {
