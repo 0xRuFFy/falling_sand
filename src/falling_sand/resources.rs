@@ -2,15 +2,15 @@ use bevy::prelude::*;
 
 pub type BrushT = &'static [Vec2];
 
-const BRUSH_SMALL: BrushT = &[Vec2::new(0.0, 0.0)];
-const BRUSH_MEDIUM: BrushT = &[
+const BRUSH_DOT: BrushT = &[Vec2::new(0.0, 0.0)];
+const BRUSH_SMALL: BrushT = &[
     Vec2::new(0.0, 0.0),
     Vec2::new(1.0, 0.0),
     Vec2::new(-1.0, 0.0),
     Vec2::new(0.0, 1.0),
     Vec2::new(0.0, -1.0),
 ];
-const BRUSH_BIG: BrushT = &[
+const BRUSH_MEDIUM: BrushT = &[
     Vec2::new(0.0, 0.0),
     Vec2::new(1.0, 0.0),
     Vec2::new(1.0, 1.0),
@@ -25,7 +25,7 @@ const BRUSH_BIG: BrushT = &[
     Vec2::new(0.0, 2.0),
     Vec2::new(0.0, -2.0),
 ];
-const BRUSH_LARGE: BrushT = &[
+const BRUSH_BIG: BrushT = &[
     Vec2::new(0.0, 0.0),
     Vec2::new(1.0, 0.0),
     Vec2::new(1.0, 1.0),
@@ -50,11 +50,63 @@ const BRUSH_LARGE: BrushT = &[
     Vec2::new(0.0, 2.0),
     Vec2::new(0.0, -2.0),
 ];
+/*
+ *     + + +
+ *   + + + + +
+ * + + + + + + +
+ * + + + + + + +
+ * + + + + + + +
+ *   + + + + +
+ *     + + +
+ */
+const BRUSH_LARGE: BrushT = &[
+    Vec2::new(0.0, 0.0),
+    Vec2::new(0.0, 1.0),
+    Vec2::new(0.0, 2.0),
+    Vec2::new(0.0, 3.0),
+    Vec2::new(0.0, -3.0),
+    Vec2::new(0.0, -2.0),
+    Vec2::new(0.0, -1.0),
+    Vec2::new(1.0, 0.0),
+    Vec2::new(1.0, 1.0),
+    Vec2::new(1.0, 2.0),
+    Vec2::new(1.0, 3.0),
+    Vec2::new(1.0, -3.0),
+    Vec2::new(1.0, -2.0),
+    Vec2::new(1.0, -1.0),
+    Vec2::new(2.0, 0.0),
+    Vec2::new(2.0, 1.0),
+    Vec2::new(2.0, 2.0),
+    Vec2::new(2.0, -2.0),
+    Vec2::new(2.0, -1.0),
+    Vec2::new(3.0, 0.0),
+    Vec2::new(3.0, 1.0),
+    Vec2::new(3.0, -1.0),
+    Vec2::new(-3.0, 0.0),
+    Vec2::new(-3.0, 1.0),
+    Vec2::new(-3.0, -1.0),
+    Vec2::new(-2.0, 0.0),
+    Vec2::new(-2.0, 1.0),
+    Vec2::new(-2.0, 2.0),
+    Vec2::new(-2.0, -2.0),
+    Vec2::new(-2.0, -1.0),
+    Vec2::new(-1.0, 0.0),
+    Vec2::new(-1.0, 1.0),
+    Vec2::new(-1.0, 2.0),
+    Vec2::new(-1.0, 3.0),
+    Vec2::new(-1.0, -3.0),
+    Vec2::new(-1.0, -2.0),
+    Vec2::new(-1.0, -1.0),
+];
 
 #[derive(Resource)]
 pub struct Brush(BrushT);
 
 impl Brush {
+    pub fn use_dot(&mut self) {
+        self.0 = BRUSH_DOT;
+    }
+
     pub fn use_small(&mut self) {
         self.0 = BRUSH_SMALL;
     }
@@ -79,6 +131,7 @@ impl Brush {
 impl Default for Brush {
     fn default() -> Self {
         let mut brush = Brush(&[]);
+        // brush.use_dot();
         // brush.use_small();
         // brush.use_medium();
         // brush.use_big();
