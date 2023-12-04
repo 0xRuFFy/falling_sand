@@ -61,6 +61,8 @@ impl World {
         //       wake a particle up if a nearby particle is moving then go back to sleep
         //       -> this should reduce the number of updated particles drastically!
 
+        // NOTE: in case of getting only none sleeping particles:
+        //       Don't clone all particles, but only those that are not sleeping here
         for key in self.particles.clone().keys().sorted() {
             let (mut transform, mut particle) = query.get_mut(self.particles[key]).unwrap();
 
