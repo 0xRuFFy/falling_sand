@@ -1,7 +1,6 @@
+use super::particles::Particle;
 use bevy::prelude::*;
 use bevy::utils::HashMap;
-
-use super::particles::Particle;
 
 #[derive(Resource)]
 pub struct World {

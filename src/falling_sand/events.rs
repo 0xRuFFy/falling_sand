@@ -1,5 +1,6 @@
-use super::particles::{base_spawn, Particle};
+use super::particles::Particle;
 use super::world;
+use crate::falling_sand::resources::SpawnTimer;
 use bevy::prelude::*;
 
 #[derive(Event)]
@@ -10,19 +11,27 @@ pub struct SpawnParticleEvent {
 
 impl SpawnParticleEvent {
     pub fn new(position: Vec2, particle: Particle) -> Self {
-        SpawnParticleEvent { position, particle }
+        SpawnParticleEvent {
+            position,
+            particle,
+        }
     }
 }
 
 pub fn spawn_particle(
     mut commands: Commands,
-    mut spanw_event: EventReader<SpawnParticleEvent>,
+    mut spawn_event: EventReader<SpawnParticleEvent>,
     mut world: ResMut<world::World>,
+    mut spawn_timer: ResMut<SpawnTimer>,
 ) {
-    for event in spanw_event.read() {
+    for event in spawn_event.read() {
+        if !spawn_timer.guard() {
+            return;
+        }
+
         if world.is_empty(event.position) {
             world.insert(event.position, event.particle);
-            base_spawn(&mut commands, &event.position, event.particle);
+            event.particle.spawn(&mut commands, &event.position);
         }
     }
 }

@@ -1,20 +1,22 @@
 use super::events::SpawnParticleEvent;
 use super::particles::Particle;
 use super::world;
+use crate::falling_sand::resources::SpawnTimer;
 use crate::systems::PIXELS_PER_UNIT;
 use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
-pub fn setup(mut commands: Commands, window_query: Query<&Window, With<PrimaryWindow>>) {
-    if let Ok(window) = window_query.get_single() {
-        commands.insert_resource(world::World::new(
-            // (window.width() * PIXELS_PER_UNIT) as usize,
-            // (window.height() * PIXELS_PER_UNIT) as usize,
-        ));
-    }
+pub fn setup(mut commands: Commands) {
+    commands.insert_resource(world::World::new());
+    commands.insert_resource(SpawnTimer::default());
+    commands.insert_resource(Time::<Fixed>::from_seconds(0.016))
 }
 
-pub fn update(mut world: ResMut<world::World>, mut query: Query<(&mut Transform, &mut Particle)>) {
+pub fn update(mut spawn_timer: ResMut<SpawnTimer>, time: Res<Time>) {
+    spawn_timer.tick(time)
+}
+
+pub fn fixed_update(mut world: ResMut<world::World>, mut query: Query<(&mut Transform, &mut Particle)>) {
     world.update(&mut query);
 }
 
@@ -35,9 +37,10 @@ pub fn spawn_particle_mouse(
 
             if mouse_button_input.pressed(MouseButton::Left) {
                 spawn_event.send(SpawnParticleEvent::new(position, Particle::Sand))
-            } else if mouse_button_input.pressed(MouseButton::Right) {
-                spawn_event.send(SpawnParticleEvent::new(position, Particle::Water))
             }
+            // else if mouse_button_input.pressed(MouseButton::Right) {
+            //     spawn_event.send(SpawnParticleEvent::new(position, Particle::Water))
+            // }
         }
     }
 }
