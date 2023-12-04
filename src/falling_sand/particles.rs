@@ -97,6 +97,12 @@ impl Particle {
     }
 
     pub fn update(&mut self, position: Vec2, world: &world::World) -> Option<Vec2> {
+        // TODO: Stop using a const speed and switch it for gravity -> need to chage the collision
+        //       logic to account speed != 1.
+        if self.is_empty() {
+            return None;
+        }
+
         if let Some(movement) = self.movement() {
             for group in movement {
                 let dir = group.choose().unwrap();

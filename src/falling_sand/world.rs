@@ -57,6 +57,10 @@ impl World {
     }
 
     pub fn update(&mut self, query: &mut Query<(&mut Transform, &mut Particle)>) {
+        // TODO: implement as sleep state for particles that are not moving /
+        //       wake a particle up if a nearby particle is moving then go back to sleep
+        //       -> this should reduce the number of updated particles drastically!
+
         for key in self.particles.clone().keys().sorted() {
             let (mut transform, mut particle) = query.get_mut(self.particles[key]).unwrap();
 
