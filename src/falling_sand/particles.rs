@@ -42,6 +42,21 @@ const PARTICLE_WATER_MOVEMENT: PMovement = &[
     MovementOptionGroup(&[IVec2::new(1, 0), IVec2::new(-1, 0)]),
 ];
 
+#[derive(Component)]
+pub struct ParticleData {
+    pub __type: Particle,
+    pub position: IVec2,
+}
+
+impl ParticleData {
+    pub fn new(__type: Particle, position: IVec2) -> Self {
+        Self {
+            __type,
+            position,
+        }
+    }
+}
+
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Particle {
     Empty,
@@ -90,13 +105,14 @@ impl Particle {
                         transform: Transform::from_translation(position.extend(0).as_vec3()),
                         ..default()
                     },
-                    *self,
+                    ParticleData::new(*self, *position),
+                    *self, // TODO: Remove
                 ))
                 .id(),
         )
     }
 
-    pub fn update(&mut self, position: IVec2, world: &world::World) -> Option<IVec2> {
+    pub fn update(&mut self, data: &ParticleData, world: &world::World) -> Option<IVec2> {
         // TODO: Stop using a const speed and switch it for gravity -> need to chage the collision
         //       logic to account speed != 1.
         if self.is_empty() {
@@ -106,7 +122,7 @@ impl Particle {
         if let Some(movement) = self.movement() {
             for group in movement {
                 let dir = group.choose().unwrap();
-                let desired_position = IVec2::new(position.x + dir.x, position.y + dir.y);
+                let desired_position = data.position + *dir;
                 if world.is_empty(desired_position) {
                     return Some(desired_position);
                 }

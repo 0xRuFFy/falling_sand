@@ -1,5 +1,5 @@
 use super::events::SpawnParticleEvent;
-use super::particles::Particle;
+use super::particles::{Particle, ParticleData};
 use super::world;
 use crate::falling_sand::resources::{Brush, SpawnTimer};
 use crate::systems::PIXELS_PER_UNIT;
@@ -20,7 +20,7 @@ pub fn update(mut spawn_timer: ResMut<SpawnTimer>, time: Res<Time>) {
 
 pub fn fixed_update(
     mut world: ResMut<world::World>,
-    mut query: Query<(&mut Transform, &mut Particle)>,
+    mut query: Query<(&mut Transform, &mut ParticleData)>,
 ) {
     world.update(&mut query);
 }

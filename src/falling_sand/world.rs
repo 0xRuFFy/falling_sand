@@ -1,4 +1,4 @@
-use super::particles::Particle;
+use super::particles::{Particle, ParticleData};
 use bevy::prelude::*;
 use bevy::utils::HashMap;
 use itertools::Itertools;
@@ -56,7 +56,7 @@ impl World {
         self.particles.insert(new, id);
     }
 
-    pub fn update(&mut self, query: &mut Query<(&mut Transform, &mut Particle)>) {
+    pub fn update(&mut self, query: &mut Query<(&mut Transform, &mut ParticleData)>) {
         // TODO: implement as sleep state for particles that are not moving /
         //       wake a particle up if a nearby particle is moving then go back to sleep
         //       -> this should reduce the number of updated particles drastically!
@@ -64,13 +64,12 @@ impl World {
         // NOTE: in case of getting only none sleeping particles:
         //       Don't clone all particles, but only those that are not sleeping here
         for key in self.particles.clone().keys().sorted() {
-            let (mut transform, mut particle) = query.get_mut(self.particles[key]).unwrap();
+            let (mut transform, mut data) = query.get_mut(self.particles[key]).unwrap();
 
-            let position = transform.translation.xy().as_ivec2();
-
-            if let Some(new_position) = particle.update(position, &self) {
+            if let Some(new_position) = data.__type.clone().update(&data, &self) {
                 transform.translation = new_position.as_vec2().extend(transform.translation.z);
-                self.update_position(position, new_position);
+                self.update_position(data.position, new_position);
+                data.position = new_position;
             }
         }
     }
