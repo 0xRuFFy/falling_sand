@@ -6,18 +6,18 @@ use itertools::Itertools;
 #[derive(Resource)]
 pub struct World {
     particles: HashMap<(usize, usize), Entity>,
-    ground_level: f32,
+    ground_level: i32,
 }
 
 impl World {
-    pub fn new(ground_level: f32) -> Self {
+    pub fn new(ground_level: i32) -> Self {
         World {
             particles: HashMap::new(),
             ground_level,
         }
     }
 
-    pub fn is_empty(&self, position: Vec2) -> bool {
+    pub fn is_empty(&self, position: IVec2) -> bool {
         let x = position.x as usize;
         let y = position.y as usize;
         self.ground_level <= position.y && self.particles.get(&(x, y)).is_none()
@@ -32,7 +32,7 @@ impl World {
     //     None
     // }
 
-    pub fn insert(&mut self, commands: &mut Commands, position: Vec2, particle: Particle) {
+    pub fn insert(&mut self, commands: &mut Commands, position: IVec2, particle: Particle) {
         if particle.is_empty() || !self.is_empty(position) {
             return;
         }
@@ -44,7 +44,7 @@ impl World {
             .insert((x, y), particle.spawn(commands, &position).unwrap());
     }
 
-    fn update_position(&mut self, old_position: Vec2, new_position: Vec2) {
+    fn update_position(&mut self, old_position: IVec2, new_position: IVec2) {
         if self.is_empty(old_position) || !self.is_empty(new_position) {
             return;
         }
@@ -66,10 +66,10 @@ impl World {
         for key in self.particles.clone().keys().sorted() {
             let (mut transform, mut particle) = query.get_mut(self.particles[key]).unwrap();
 
-            let position = transform.translation.xy();
+            let position = transform.translation.xy().as_ivec2();
 
             if let Some(new_position) = particle.update(position, &self) {
-                transform.translation = new_position.extend(transform.translation.z);
+                transform.translation = new_position.as_vec2().extend(transform.translation.z);
                 self.update_position(position, new_position);
             }
         }

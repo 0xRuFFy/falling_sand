@@ -7,7 +7,7 @@ use bevy::prelude::*;
 use bevy::window::PrimaryWindow;
 
 pub fn setup(mut commands: Commands) {
-    commands.insert_resource(world::World::new(0.0));
+    commands.insert_resource(world::World::new(0));
     // commands.insert_resource(SpawnTimer::new(0.25));
     commands.insert_resource(SpawnTimer::default());
     commands.insert_resource(Time::<Fixed>::from_seconds(0.016));
@@ -35,9 +35,9 @@ pub fn spawn_particle_mouse(
     }
     if let Ok(window) = window_query.get_single() {
         if let Some(position) = window.cursor_position() {
-            let position = Vec2::new(
-                (position.x as u32 / PIXELS_PER_UNIT as u32) as f32,
-                ((window.height() - position.y) as u32 / PIXELS_PER_UNIT as u32) as f32,
+            let position = IVec2::new(
+                position.x as i32 / PIXELS_PER_UNIT as i32,
+                (window.height() - position.y) as i32 / PIXELS_PER_UNIT as i32,
             );
 
             if mouse_button_input.pressed(MouseButton::Left) {

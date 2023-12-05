@@ -6,12 +6,12 @@ use std::ops::Add;
 
 #[derive(Event)]
 pub struct SpawnParticleEvent {
-    position: Vec2,
+    position: IVec2,
     particle: Particle,
 }
 
 impl SpawnParticleEvent {
-    pub fn new(position: Vec2, particle: Particle) -> Self {
+    pub fn new(position: IVec2, particle: Particle) -> Self {
         SpawnParticleEvent {
             position,
             particle,

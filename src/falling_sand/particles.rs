@@ -22,10 +22,10 @@ const PARTICLE_WATER_COLOR: PColor = &[
     Color::rgb(0.267, 0.278, 0.988),
 ];
 
-struct MovementOptionGroup(&'static [Vec2]);
+struct MovementOptionGroup(&'static [IVec2]);
 
 impl MovementOptionGroup {
-    fn choose(&self) -> Option<&Vec2> {
+    fn choose(&self) -> Option<&IVec2> {
         let mut rng = rand::thread_rng();
         self.0.choose(&mut rng)
     }
@@ -33,13 +33,13 @@ impl MovementOptionGroup {
 
 type PMovement = &'static [MovementOptionGroup];
 const PARTICLE_SAND_MOVEMENT: PMovement = &[
-    MovementOptionGroup(&[Vec2::new(0.0, -1.0)]),
-    MovementOptionGroup(&[Vec2::new(1.0, -1.0), Vec2::new(-1.0, -1.0)]),
+    MovementOptionGroup(&[IVec2::new(0, -1)]),
+    MovementOptionGroup(&[IVec2::new(1, -1), IVec2::new(-1, -1)]),
 ];
 
 const PARTICLE_WATER_MOVEMENT: PMovement = &[
-    MovementOptionGroup(&[Vec2::new(0.0, -1.0)]),
-    MovementOptionGroup(&[Vec2::new(1.0, 0.0), Vec2::new(-1.0, 0.0)]),
+    MovementOptionGroup(&[IVec2::new(0, -1)]),
+    MovementOptionGroup(&[IVec2::new(1, 0), IVec2::new(-1, 0)]),
 ];
 
 #[derive(Component, Debug, Clone, Copy, PartialEq, Eq)]
@@ -72,7 +72,7 @@ impl Particle {
         }
     }
 
-    pub fn spawn(&self, commands: &mut Commands, position: &Vec2) -> Option<Entity> {
+    pub fn spawn(&self, commands: &mut Commands, position: &IVec2) -> Option<Entity> {
         if self.is_empty() {
             return None;
         }
@@ -87,7 +87,7 @@ impl Particle {
                             anchor: Anchor::BottomLeft,
                             ..default()
                         },
-                        transform: Transform::from_translation(position.extend(0.0)),
+                        transform: Transform::from_translation(position.extend(0).as_vec3()),
                         ..default()
                     },
                     *self,
@@ -96,7 +96,7 @@ impl Particle {
         )
     }
 
-    pub fn update(&mut self, position: Vec2, world: &world::World) -> Option<Vec2> {
+    pub fn update(&mut self, position: IVec2, world: &world::World) -> Option<IVec2> {
         // TODO: Stop using a const speed and switch it for gravity -> need to chage the collision
         //       logic to account speed != 1.
         if self.is_empty() {
@@ -106,7 +106,7 @@ impl Particle {
         if let Some(movement) = self.movement() {
             for group in movement {
                 let dir = group.choose().unwrap();
-                let desired_position = Vec2::new(position.x + dir.x, position.y + dir.y);
+                let desired_position = IVec2::new(position.x + dir.x, position.y + dir.y);
                 if world.is_empty(desired_position) {
                     return Some(desired_position);
                 }
