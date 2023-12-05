@@ -140,22 +140,28 @@ impl Default for Brush {
     }
 }
 
-#[derive(Resource, Default)]
+const SPAWN_DELAY: f32 = 0.08;
+
+#[derive(Resource)]
 pub struct SpawnTimer {
     timer: f32,
     guard: bool,
+    delay: f32,
 }
 
 impl SpawnTimer {
-    const SPAWN_DELAY: f32 = 0.08;
-
-    pub fn new(&self) -> Self {
-        Self::default()
+    pub fn new(delay: f32) -> Self {
+        Self {
+            timer: 0.0,
+            guard: false,
+            delay,
+            // ..default()
+        }
     }
 
     pub fn tick(&mut self, time: Res<Time>) {
         self.timer += time.delta_seconds();
-        if self.timer >= Self::SPAWN_DELAY {
+        if self.timer >= self.delay {
             self.guard = true;
             self.timer = 0.0;
         }
@@ -168,5 +174,15 @@ impl SpawnTimer {
             return true;
         }
         false
+    }
+}
+
+impl Default for SpawnTimer {
+    fn default() -> Self {
+        Self {
+            timer: 0.0,
+            guard: false,
+            delay: SPAWN_DELAY,
+        }
     }
 }
