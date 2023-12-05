@@ -63,13 +63,14 @@ impl World {
 
         // NOTE: in case of getting only none sleeping particles:
         //       Don't clone all particles, but only those that are not sleeping here
-        for key in self.particles.clone().keys().sorted() {
+        for key in self.particles.clone().keys() {
             let (mut transform, mut data) = query.get_mut(self.particles[key]).unwrap();
 
             if let Some(new_position) = data.__type.clone().update(&mut data, &self) {
                 transform.translation = new_position.as_vec2().extend(transform.translation.z);
                 self.update_position(data.position, new_position);
                 data.position = new_position;
+            } else {
             }
         }
     }

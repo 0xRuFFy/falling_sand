@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use rand::prelude::SliceRandom;
 
-const GRAVITY: f32 = 0.01;
+const GRAVITY: f32 = 0.025;
 
 type PColor = &'static [Color];
 const PARTICLE_DEFAULT_COLOR: &Color = &Color::rgb(0.0, 0.0, 0.0);
@@ -25,9 +25,11 @@ const PARTICLE_WATER_COLOR: PColor = &[
 struct MovementOptionGroup(&'static [IVec2]);
 
 impl MovementOptionGroup {
-    fn choose(&self) -> Option<&IVec2> {
+    fn shuffle(&self) -> Vec<IVec2> {
         let mut rng = rand::thread_rng();
-        self.0.choose(&mut rng)
+        let mut group = self.0.to_vec();
+        group.shuffle(&mut rng);
+        group
     }
 }
 
@@ -42,7 +44,7 @@ const PARTICLE_WATER_MOVEMENT: PMovement = &[
     MovementOptionGroup(&[IVec2::new(1, 0), IVec2::new(-1, 0)]),
 ];
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct ParticleData {
     pub __type: Particle,
     pub position: IVec2,
@@ -114,6 +116,38 @@ impl Particle {
         )
     }
 
+    fn step_by_step(&self, data: &ParticleData, world: &world::World) -> Option<IVec2> {
+        fn get_next_step(velocity: &IVec2) -> IVec2 {
+            IVec2::new(
+                if velocity.x == 0 {
+                    0
+                } else {
+                    velocity.x.signum() as i32
+                },
+                if velocity.y == 0 {
+                    0
+                } else {
+                    velocity.y.signum() as i32
+                },
+            )
+        }
+
+        let mut velocity = data.velocity.clone().as_ivec2();
+        let mut position = data.position.clone();
+        let mut next_step = get_next_step(&mut velocity);
+        while next_step != IVec2::ZERO {
+            if world.is_empty(position + next_step) {
+                position += next_step;
+            } else {
+                break;
+            }
+            velocity -= next_step;
+            next_step = get_next_step(&velocity);
+        }
+
+        Some(position)
+    }
+
     pub fn update(&mut self, data: &mut ParticleData, world: &world::World) -> Option<IVec2> {
         // TODO: Stop using a const speed and switch it for gravity -> need to chage the collision
         //       logic to account speed != 1.
@@ -123,12 +157,18 @@ impl Particle {
 
         if let Some(movement) = self.movement() {
             for group in movement {
-                let dir = group.choose().unwrap();
-                let desired_position = data.position + *dir;
-                if world.is_empty(desired_position) {
-                    let normal_dir = dir.as_vec2().normalize();
-                    data.velocity += GRAVITY * normal_dir;
-                    return Some(desired_position);
+                let mut __group = group.shuffle();
+                for dir in __group {
+                    let desired_position = data.position + dir;
+                    if world.is_empty(desired_position) {
+                        let normal_dir = dir.as_vec2().normalize();
+                        if data.velocity == Vec2::ZERO {
+                            data.velocity = dir.as_vec2();
+                        }
+                        data.velocity += GRAVITY * normal_dir;
+                        return Some(desired_position);
+                        // return self.step_by_step(data, world);
+                    }
                 }
             }
         };
