@@ -66,7 +66,7 @@ impl World {
         for key in self.particles.clone().keys().sorted() {
             let (mut transform, mut data) = query.get_mut(self.particles[key]).unwrap();
 
-            if let Some(new_position) = data.__type.clone().update(&data, &self) {
+            if let Some(new_position) = data.__type.clone().update(&mut data, &self) {
                 transform.translation = new_position.as_vec2().extend(transform.translation.z);
                 self.update_position(data.position, new_position);
                 data.position = new_position;

@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use rand::prelude::SliceRandom;
 
-// TODO: FIX THIS MESS
+const GRAVITY: f32 = 0.01;
 
 type PColor = &'static [Color];
 const PARTICLE_DEFAULT_COLOR: &Color = &Color::rgb(0.0, 0.0, 0.0);
@@ -46,6 +46,7 @@ const PARTICLE_WATER_MOVEMENT: PMovement = &[
 pub struct ParticleData {
     pub __type: Particle,
     pub position: IVec2,
+    pub velocity: Vec2, // Is not IVec so it can accumulate velocity from e.g. gravity
 }
 
 impl ParticleData {
@@ -53,6 +54,7 @@ impl ParticleData {
         Self {
             __type,
             position,
+            velocity: Vec2::ZERO,
         }
     }
 }
@@ -112,7 +114,7 @@ impl Particle {
         )
     }
 
-    pub fn update(&mut self, data: &ParticleData, world: &world::World) -> Option<IVec2> {
+    pub fn update(&mut self, data: &mut ParticleData, world: &world::World) -> Option<IVec2> {
         // TODO: Stop using a const speed and switch it for gravity -> need to chage the collision
         //       logic to account speed != 1.
         if self.is_empty() {
@@ -124,11 +126,14 @@ impl Particle {
                 let dir = group.choose().unwrap();
                 let desired_position = data.position + *dir;
                 if world.is_empty(desired_position) {
+                    let normal_dir = dir.as_vec2().normalize();
+                    data.velocity += GRAVITY * normal_dir;
                     return Some(desired_position);
                 }
             }
         };
 
+        data.velocity *= 0.0;
         None
     }
 }
