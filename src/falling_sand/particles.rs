@@ -147,6 +147,7 @@ impl Particle {
         //       of its momentum -> so for example a water particle will not randomly change direction
         //       --> Also implement some sort of energy loss so particles will stop moving even if they
         //       are not colliding with anything
+        //       --> Also I think water is broken
         if self.is_empty() {
             return None;
         }
