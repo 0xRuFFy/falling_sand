@@ -10,17 +10,18 @@ type PColor = &'static [Color];
 const PARTICLE_DEFAULT_COLOR: &Color = &Color::rgb(0.0, 0.0, 0.0);
 const PARTICLE_EMPTY_COLOR: PColor = &[];
 const PARTICLE_SAND_COLOR: PColor = &[
-    Color::rgb(1.0, 0.824, 0.196),
-    Color::rgb(0.949, 0.8, 0.141),
-    Color::rgb(0.949, 0.733, 0.141),
-    Color::rgb(0.878, 0.702, 0.212),
-    Color::rgb(0.961, 0.812, 0.392),
+    Color::rgb(0.965, 0.843, 0.69),
+    Color::rgb(0.949, 0.824, 0.663),
+    Color::rgb(0.925, 0.8, 0.635),
+    Color::rgb(0.906, 0.769, 0.588),
+    Color::rgb(0.882, 0.749, 0.573),
 ];
 const PARTICLE_WATER_COLOR: PColor = &[
-    Color::rgb(0.392, 0.49, 0.961),
-    Color::rgb(0.314, 0.322, 0.871),
-    Color::rgb(0.463, 0.471, 0.91),
-    Color::rgb(0.267, 0.278, 0.988),
+    Color::rgb(0.0, 0.624, 0.784),
+    Color::rgb(0.0, 0.671, 0.843),
+    Color::rgb(0.0, 0.71, 0.894),
+    Color::rgb(0.122, 0.757, 0.918),
+    Color::rgb(0.224, 0.816, 0.969),
 ];
 
 struct MovementOptionGroup(&'static [IVec2]);
