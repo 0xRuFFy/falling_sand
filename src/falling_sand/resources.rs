@@ -34,15 +34,6 @@ const BRUSH_BIG: BrushT = &[
     IVec2::new(-3, -1),
     IVec2::new(-4, 0),
 ];
-/*
- *     + + +
- *   + + + + +
- * + + + + + + +
- * + + + + + + +
- * + + + + + + +
- *   + + + + +
- *     + + +
- */
 const BRUSH_LARGE: BrushT = &[
     IVec2::new(0, 0),
     IVec2::new(0, 1),
