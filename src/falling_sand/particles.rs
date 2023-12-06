@@ -3,7 +3,8 @@ use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use rand::prelude::SliceRandom;
 
-const GRAVITY: f32 = 0.025;
+const GRAVITY: Vec2 = Vec2::new(0.0, -0.25);
+const TIME_UNTIL_SLEEP: u32 = 15;
 
 type PColor = &'static [Color];
 const PARTICLE_DEFAULT_COLOR: &Color = &Color::rgb(0.0, 0.0, 0.0);
@@ -44,11 +45,13 @@ const PARTICLE_WATER_MOVEMENT: PMovement = &[
     MovementOptionGroup(&[IVec2::new(1, 0), IVec2::new(-1, 0)]),
 ];
 
-#[derive(Component, Debug)]
+#[derive(Component, Debug, Clone, Copy)]
 pub struct ParticleData {
     pub __type: Particle,
     pub position: IVec2,
     pub velocity: Vec2, // Is not IVec so it can accumulate velocity from e.g. gravity
+    sleep_count: u32,
+    asleep: bool,
 }
 
 impl ParticleData {
@@ -56,7 +59,25 @@ impl ParticleData {
         Self {
             __type,
             position,
-            velocity: Vec2::ZERO,
+            velocity: Vec2::new(0.0, -1.0),
+            sleep_count: 0,
+            asleep: false,
+        }
+    }
+
+    pub fn is_asleep(&self) -> bool {
+        self.asleep
+    }
+
+    pub fn wake(&mut self) {
+        self.sleep_count = 0;
+        self.asleep = false;
+    }
+
+    pub fn sleep(&mut self) {
+        self.sleep_count += 1;
+        if self.sleep_count >= TIME_UNTIL_SLEEP {
+            self.asleep = true;
         }
     }
 }
@@ -116,64 +137,51 @@ impl Particle {
         )
     }
 
-    fn step_by_step(&self, data: &ParticleData, world: &world::World) -> Option<IVec2> {
-        fn get_next_step(velocity: &IVec2) -> IVec2 {
-            IVec2::new(
-                if velocity.x == 0 {
-                    0
-                } else {
-                    velocity.x.signum() as i32
-                },
-                if velocity.y == 0 {
-                    0
-                } else {
-                    velocity.y.signum() as i32
-                },
-            )
-        }
-
-        let mut velocity = data.velocity.clone().as_ivec2();
-        let mut position = data.position.clone();
-        let mut next_step = get_next_step(&mut velocity);
-        while next_step != IVec2::ZERO {
-            if world.is_empty(position + next_step) {
-                position += next_step;
-            } else {
-                break;
-            }
-            velocity -= next_step;
-            next_step = get_next_step(&velocity);
-        }
-
-        Some(position)
-    }
-
     pub fn update(&mut self, data: &mut ParticleData, world: &world::World) -> Option<IVec2> {
-        // TODO: Stop using a const speed and switch it for gravity -> need to chage the collision
-        //       logic to account speed != 1.
         if self.is_empty() {
             return None;
         }
 
+        let mut updated = false;
+        let mut position = data.position;
+
         if let Some(movement) = self.movement() {
-            for group in movement {
-                let mut __group = group.shuffle();
-                for dir in __group {
-                    let desired_position = data.position + dir;
-                    if world.is_empty(desired_position) {
-                        let normal_dir = dir.as_vec2().normalize();
-                        if data.velocity == Vec2::ZERO {
-                            data.velocity = dir.as_vec2();
+            data.velocity += GRAVITY;
+            let mut momentum = data.velocity.length();
+            while momentum > 1.0 {
+                let mut can_break = false;
+                for group in movement {
+                    let mut __group = group.shuffle();
+                    for dir in __group {
+                        let desired_position = position + dir;
+                        if world.is_empty(desired_position) {
+                            momentum -= 1.0;
+                            if momentum < 0.0 {
+                                return Some(position);
+                            }
+                            position = desired_position;
+                            can_break = true;
+                            updated = true;
+                            break;
                         }
-                        data.velocity += GRAVITY * normal_dir;
-                        return Some(desired_position);
-                        // return self.step_by_step(data, world);
                     }
+                    if can_break {
+                        break;
+                    }
+                }
+                if !can_break {
+                    // data.velocity = Vec2::ZERO;
+                    break;
                 }
             }
         };
 
-        data.velocity *= 0.0;
-        None
+        if updated {
+            data.wake();
+            Some(position)
+        } else {
+            data.sleep();
+            None
+        }
     }
 }
