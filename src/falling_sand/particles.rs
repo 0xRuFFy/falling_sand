@@ -4,7 +4,7 @@ use bevy::sprite::Anchor;
 use rand::prelude::SliceRandom;
 
 const GRAVITY: Vec2 = Vec2::new(0.0, -0.25);
-const TIME_UNTIL_SLEEP: u32 = 15;
+const TIME_UNTIL_SLEEP: u32 = 40;
 
 type PColor = &'static [Color];
 const PARTICLE_DEFAULT_COLOR: &Color = &Color::rgb(0.0, 0.0, 0.0);
@@ -71,6 +71,9 @@ impl ParticleData {
     }
 
     pub fn wake(&mut self) {
+        if self.asleep {
+            self.velocity = Vec2::new(0.0, -1.0);
+        }
         self.sleep_count = 0;
         self.asleep = false;
     }
@@ -78,6 +81,7 @@ impl ParticleData {
     pub fn sleep(&mut self) {
         self.sleep_count += 1;
         if self.sleep_count >= TIME_UNTIL_SLEEP {
+            self.velocity = Vec2::new(0.0, 0.0);
             self.asleep = true;
         }
     }
@@ -139,6 +143,10 @@ impl Particle {
     }
 
     pub fn update(&mut self, data: &mut ParticleData, world: &world::World) -> Option<IVec2> {
+        // TODO: implement some sort of energy conservation where a particle wants to move in the direction
+        //       of its momentum -> so for example a water particle will not randomly change direction
+        //       --> Also implement some sort of energy loss so particles will stop moving even if they
+        //       are not colliding with anything
         if self.is_empty() {
             return None;
         }
@@ -171,7 +179,6 @@ impl Particle {
                     }
                 }
                 if !can_break {
-                    // data.velocity = Vec2::ZERO;
                     break;
                 }
             }
