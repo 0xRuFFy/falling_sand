@@ -4,51 +4,35 @@ pub type BrushT = &'static [IVec2];
 
 const BRUSH_DOT: BrushT = &[IVec2::new(0, 0)];
 const BRUSH_SMALL: BrushT = &[
-    IVec2::new(0, 0),
     IVec2::new(1, 0),
     IVec2::new(-1, 0),
     IVec2::new(0, 1),
     IVec2::new(0, -1),
 ];
 const BRUSH_MEDIUM: BrushT = &[
-    IVec2::new(0, 0),
-    IVec2::new(1, 0),
     IVec2::new(1, 1),
     IVec2::new(1, -1),
     IVec2::new(2, 0),
-    IVec2::new(-1, 0),
     IVec2::new(-1, 1),
     IVec2::new(-1, -1),
     IVec2::new(-2, 0),
     IVec2::new(0, 1),
     IVec2::new(0, -1),
-    IVec2::new(0, 2),
-    IVec2::new(0, -2),
 ];
 const BRUSH_BIG: BrushT = &[
     IVec2::new(0, 0),
-    IVec2::new(1, 0),
     IVec2::new(1, 1),
     IVec2::new(1, -1),
-    IVec2::new(1, 2),
-    IVec2::new(1, -2),
-    IVec2::new(2, 0),
     IVec2::new(2, 1),
     IVec2::new(2, -1),
     IVec2::new(3, 0),
+    IVec2::new(4, 0),
     IVec2::new(-1, 0),
-    IVec2::new(-1, 1),
-    IVec2::new(-1, -1),
-    IVec2::new(-1, 2),
-    IVec2::new(-1, -2),
-    IVec2::new(-2, 0),
     IVec2::new(-2, 1),
     IVec2::new(-2, -1),
-    IVec2::new(-3, 0),
-    IVec2::new(0, 1),
-    IVec2::new(0, -1),
-    IVec2::new(0, 2),
-    IVec2::new(0, -2),
+    IVec2::new(-3, 1),
+    IVec2::new(-3, -1),
+    IVec2::new(-4, 0),
 ];
 /*
  *     + + +
@@ -132,10 +116,10 @@ impl Default for Brush {
     fn default() -> Self {
         let mut brush = Brush(&[]);
         // brush.use_dot();
-        brush.use_small();
+        // brush.use_small();
         // brush.use_medium();
         // brush.use_big();
-        // brush.use_large();
+        brush.use_large();
         brush
     }
 }
