@@ -4,7 +4,7 @@ use bevy::core_pipeline::clear_color::ClearColorConfig;
 use bevy::prelude::*;
 use bevy::window::{PresentMode, PrimaryWindow, WindowMode};
 
-pub const PIXELS_PER_UNIT: f32 = 16.0;
+pub const PIXELS_PER_UNIT: f32 = 4.0;
 const CLEAR_COLOR: Color = Color::rgb(0.035, 0., 0.070);
 const RESOLUTION: (f32, f32) = (1280., 720.);
 
@@ -12,9 +12,8 @@ pub fn setup(mut commands: Commands, mut window_query: Query<&mut Window, With<P
     let mut window = window_query.single_mut();
 
     window.title = "Falling Sand".into();
-    window.present_mode = PresentMode::AutoVsync;
+    window.present_mode = PresentMode::AutoNoVsync;
     window.mode = WindowMode::Windowed;
-    // GET CLOSEST PIXEL PERFECT RESOLUTION TO RESOLUTION
     window.resolution = RESOLUTION.into();
 
     commands.insert_resource(ShowFps(true));
