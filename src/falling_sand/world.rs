@@ -5,7 +5,7 @@ use itertools::Itertools;
 
 #[derive(Resource)]
 pub struct World {
-    particles: HashMap<(usize, usize), Entity>,
+    particles: HashMap<(i32, i32), Entity>,
     ground_level: i32,
 }
 
@@ -18,8 +18,8 @@ impl World {
     }
 
     pub fn is_empty(&self, position: IVec2) -> bool {
-        let x = position.x as usize;
-        let y = position.y as usize;
+        let x = position.x;
+        let y = position.y;
         self.ground_level <= position.y && self.particles.get(&(x, y)).is_none()
     }
 
@@ -37,8 +37,8 @@ impl World {
             return;
         }
 
-        let x = position.x as usize;
-        let y = position.y as usize;
+        let x = position.x;
+        let y = position.y;
 
         self.particles
             .insert((x, y), particle.spawn(commands, &position).unwrap());
@@ -48,8 +48,8 @@ impl World {
         if self.is_empty(old_position) || !self.is_empty(new_position) {
             return;
         }
-        let old = (old_position.x as usize, old_position.y as usize);
-        let new = (new_position.x as usize, new_position.y as usize);
+        let old = (old_position.x, old_position.y);
+        let new = (new_position.x, new_position.y);
         let id = self.particles.get(&old).unwrap().clone();
 
         self.particles.remove(&old);
@@ -63,8 +63,12 @@ impl World {
 
         // NOTE: in case of getting only none sleeping particles:
         //       Don't clone all particles, but only those that are not sleeping here
+        let mut to_wake: Vec<(i32, i32)> = Vec::new();
         for key in self.particles.clone().keys().sorted() {
             let (mut transform, mut data) = query.get_mut(self.particles[key]).unwrap();
+            if to_wake.contains(key) {
+                data.wake();
+            }
             if data.is_asleep() {
                 continue;
             }
@@ -73,7 +77,14 @@ impl World {
                 transform.translation = new_position.as_vec2().extend(transform.translation.z);
                 self.update_position(data.position, new_position);
                 data.position = new_position;
-            } else {
+                for i in 0..3 {
+                    for j in 0..3 {
+                        if i == 1 && j == 1 {
+                            continue;
+                        }
+                        to_wake.push((data.position.x + i - 1, data.position.y + j - 1));
+                    }
+                }
             }
         }
     }
