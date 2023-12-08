@@ -1,8 +1,6 @@
-use bevy::prelude::*;
-
-use crate::falling_sand::world::{World, CHUNK_SIZE};
-
 use super::resources::ShowOutlines;
+use crate::falling_sand::world::{World, CHUNK_SIZE};
+use bevy::prelude::*;
 
 pub fn setup(commands: &mut Commands) {
     commands.insert_resource(ShowOutlines(true));

@@ -1,8 +1,7 @@
+use super::world::CHUNK_SIZE;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use rand::prelude::SliceRandom;
-
-use super::world::CHUNK_SIZE;
 
 const PARTICLE_SIZE: Vec2 = Vec2::new(1.0, 1.0);
 

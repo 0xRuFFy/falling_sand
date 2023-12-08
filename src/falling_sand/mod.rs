@@ -6,10 +6,9 @@ mod chunk;
 mod particle;
 pub mod world;
 
+use self::events::{DespawnParticleEvent, SpawnParticleEvent};
 use bevy::prelude::*;
 use systems::*;
-
-use self::events::{DespawnParticleEvent, SpawnParticleEvent};
 
 pub struct FallingSandPlugin;
 

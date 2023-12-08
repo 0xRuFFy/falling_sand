@@ -7,7 +7,9 @@ pub struct SpawnParticleEvent {
 
 impl SpawnParticleEvent {
     pub fn new(position: IVec2) -> Self {
-        Self { position }
+        Self {
+            position,
+        }
     }
 }
 
@@ -18,6 +20,8 @@ pub struct DespawnParticleEvent {
 
 impl DespawnParticleEvent {
     pub fn new(position: IVec2) -> Self {
-        Self { position }
+        Self {
+            position,
+        }
     }
 }

@@ -1,11 +1,9 @@
+use super::events::{DespawnParticleEvent, SpawnParticleEvent};
+use super::resources::CurrentParticleType;
+use super::world::World;
 use crate::systems::PIXELS_PER_UNIT;
-
-use super::{
-    events::{DespawnParticleEvent, SpawnParticleEvent},
-    resources::CurrentParticleType,
-    world::World,
-};
-use bevy::{prelude::*, window::PrimaryWindow};
+use bevy::prelude::*;
+use bevy::window::PrimaryWindow;
 
 pub fn setup(mut commands: Commands) {
     commands.insert_resource(World::new());

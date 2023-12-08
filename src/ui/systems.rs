@@ -1,4 +1,5 @@
-use super::{debug_outline, ui_components::fps_display};
+use super::debug_outline;
+use super::ui_components::fps_display;
 use crate::resources::ShowFps;
 use bevy::prelude::*;
 
