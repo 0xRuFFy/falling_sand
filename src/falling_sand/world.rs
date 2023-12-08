@@ -17,6 +17,10 @@ impl World {
         }
     }
 
+    pub fn chunk_positions(&self) -> Vec<&IVec2> {
+        self.chunks.keys().collect()
+    }
+
     pub fn add_particle(&mut self, commands: &mut Commands, particle: Particle) {
         let chunk_pos = particle.position / CHUNK_SIZE as i32;
         let chunk = self

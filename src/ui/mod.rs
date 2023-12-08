@@ -1,3 +1,4 @@
+mod debug_outline;
 mod systems;
 mod ui_components;
 
@@ -9,7 +10,13 @@ pub struct UiPlugin;
 
 impl Plugin for UiPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, setup)
-            .add_systems(Update, (fps_display::update,));
+        app.add_systems(Startup, setup).add_systems(
+            Update,
+            (
+                (debug_outline::toggle_visibility, fps_display::update),
+                debug_outline::draw_outline,
+            )
+                .chain(),
+        );
     }
 }

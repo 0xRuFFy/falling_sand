@@ -4,7 +4,7 @@ mod systems;
 
 mod chunk;
 mod particle;
-mod world;
+pub mod world;
 
 use bevy::prelude::*;
 use systems::*;
