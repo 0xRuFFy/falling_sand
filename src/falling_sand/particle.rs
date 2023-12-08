@@ -66,8 +66,9 @@ impl Particle {
     }
 
     pub fn in_chunk_index(&self) -> usize {
-        let index = self.position.rem_euclid(IVec2::splat(CHUNK_SIZE as i32));
-        index.x as usize * CHUNK_SIZE + index.y as usize
+        // let index = self.position.rem_euclid(IVec2::splat(CHUNK_SIZE as i32));
+        // index.x as usize * CHUNK_SIZE + index.y as usize
+        Self::in_chunk_index_position(self.position)
     }
 
     pub fn as_vec2_position(&self) -> Vec2 {
@@ -84,5 +85,10 @@ impl Particle {
 
     pub fn as_vec3_velocity(&self) -> Vec3 {
         self.as_vec2_velocity().extend(0.0)
+    }
+
+    pub fn in_chunk_index_position(position: IVec2) -> usize {
+        let index = position.rem_euclid(IVec2::splat(CHUNK_SIZE as i32));
+        index.x as usize * CHUNK_SIZE + index.y as usize
     }
 }

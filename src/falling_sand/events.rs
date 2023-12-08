@@ -10,3 +10,14 @@ impl SpawnParticleEvent {
         Self { position }
     }
 }
+
+#[derive(Event)]
+pub struct DespawnParticleEvent {
+    pub position: IVec2,
+}
+
+impl DespawnParticleEvent {
+    pub fn new(position: IVec2) -> Self {
+        Self { position }
+    }
+}

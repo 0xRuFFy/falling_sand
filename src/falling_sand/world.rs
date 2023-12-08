@@ -25,4 +25,14 @@ impl World {
             .or_insert(Chunk::new(chunk_pos));
         chunk.insert(commands, particle);
     }
+
+    pub fn remove_particle(&mut self, commands: &mut Commands, position: IVec2) {
+        let chunk_pos = position / CHUNK_SIZE as i32;
+        if let Some(chunk) = self.chunks.get_mut(&chunk_pos) {
+            chunk.remove(commands, position);
+            if chunk.empty() {
+                self.chunks.remove(&chunk_pos);
+            }
+        }
+    }
 }

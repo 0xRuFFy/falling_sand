@@ -29,8 +29,8 @@ impl Chunk {
         }
     }
 
-    pub fn remove(&mut self, commands: &mut Commands, particle: &Particle) {
-        let index = particle.in_chunk_index();
+    pub fn remove(&mut self, commands: &mut Commands, position: IVec2) {
+        let index = Particle::in_chunk_index_position(position);
         if let Some(entity) = self.particles[index] {
             commands.entity(entity).despawn();
             self.particles[index] = None;
