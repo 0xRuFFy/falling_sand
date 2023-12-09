@@ -1,3 +1,4 @@
+use crate::utils::VecTransform;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use rand::prelude::SliceRandom;
@@ -36,9 +37,22 @@ pub enum ParticleType {
 }
 
 impl ParticleType {
-    pub fn create(&self) -> Particle {
+    pub fn create(self, commands: &mut Commands, position: IVec2) -> Particle {
         Particle {
-            __type: self.clone(),
+            __type: self,
+            __id: commands
+                .spawn(SpriteBundle {
+                    sprite: Sprite {
+                        color: *self.color().unwrap_or(DEFAULT_COLOR),
+                        custom_size: Some(PARTICLE_SIZE),
+                        anchor: Anchor::BottomLeft,
+                        ..default()
+                    },
+                    transform: Transform::from_translation(position.as_vec3()),
+                    ..default()
+                })
+                .id(),
+            position,
         }
     }
 
@@ -56,27 +70,14 @@ impl ParticleType {
     }
 }
 
-#[derive(Component, Clone, Copy)]
 pub struct Particle {
     __type: ParticleType,
+    __id: Entity,
+    pub position: IVec2,
 }
 
 impl Particle {
-    pub fn spawn(&self, commands: &mut Commands) -> Entity {
-        commands
-            .spawn((
-                SpriteBundle {
-                    sprite: Sprite {
-                        color: *self.__type.color().unwrap_or(DEFAULT_COLOR),
-                        custom_size: Some(PARTICLE_SIZE),
-                        anchor: Anchor::BottomLeft,
-                        ..default()
-                    },
-                    // transform: Transform::from_translation(self.as_vec3_position()),
-                    ..default()
-                },
-                *self,
-            ))
-            .id()
+    pub fn id(&self) -> &Entity {
+        &self.__id
     }
 }

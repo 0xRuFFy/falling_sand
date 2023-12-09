@@ -3,6 +3,7 @@ mod plugins;
 mod resources;
 mod states;
 mod systems;
+mod utils;
 
 mod falling_sand;
 mod ui;

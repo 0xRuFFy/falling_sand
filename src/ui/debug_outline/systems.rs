@@ -1,5 +1,5 @@
 use super::resources::ShowOutlines;
-use crate::falling_sand::world::{World, CHUNK_SIZE};
+use crate::falling_sand::world::World;
 use bevy::prelude::*;
 
 pub fn setup(commands: &mut Commands) {

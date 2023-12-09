@@ -12,7 +12,7 @@ pub fn setup(mut commands: Commands) {
 }
 
 pub fn fixed_update() {
-    todo!()
+    // TODO
 }
 
 pub fn spawn_particle(
@@ -22,7 +22,7 @@ pub fn spawn_particle(
     __type: Res<CurrentParticleType>,
 ) {
     for event in events.read() {
-        todo!()
+        world.insert(&mut commands, &__type, event.position);
     }
 }
 
@@ -32,7 +32,7 @@ pub fn despawn_particle(
     mut world: ResMut<World>,
 ) {
     for event in events.read() {
-        todo!()
+        world.remove(&mut commands, event.position);
     }
 }
 
