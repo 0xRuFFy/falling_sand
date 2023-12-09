@@ -2,7 +2,6 @@ mod events;
 mod resources;
 mod systems;
 
-mod chunk;
 mod particle;
 pub mod world;
 
@@ -20,6 +19,7 @@ impl Plugin for FallingSandPlugin {
             .add_systems(
                 PreUpdate,
                 (mouse_input, (spawn_particle, despawn_particle)).chain(),
-            );
+            )
+            .add_systems(FixedUpdate, fixed_update);
     }
 }

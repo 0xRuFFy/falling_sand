@@ -8,6 +8,11 @@ use bevy::window::PrimaryWindow;
 pub fn setup(mut commands: Commands) {
     commands.insert_resource(World::new());
     commands.insert_resource(CurrentParticleType::default());
+    commands.insert_resource(Time::<Fixed>::from_seconds(0.016));
+}
+
+pub fn fixed_update() {
+    todo!()
 }
 
 pub fn spawn_particle(
@@ -17,7 +22,7 @@ pub fn spawn_particle(
     __type: Res<CurrentParticleType>,
 ) {
     for event in events.read() {
-        world.add_particle(&mut commands, __type.create(event.position, IVec2::ZERO));
+        todo!()
     }
 }
 
@@ -27,7 +32,7 @@ pub fn despawn_particle(
     mut world: ResMut<World>,
 ) {
     for event in events.read() {
-        world.remove_particle(&mut commands, event.position);
+        todo!()
     }
 }
 

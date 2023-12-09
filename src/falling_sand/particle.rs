@@ -1,4 +1,3 @@
-use super::world::CHUNK_SIZE;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
 use rand::prelude::SliceRandom;
@@ -37,11 +36,9 @@ pub enum ParticleType {
 }
 
 impl ParticleType {
-    pub fn create(&self, position: IVec2, velocity: IVec2) -> Particle {
+    pub fn create(&self) -> Particle {
         Particle {
             __type: self.clone(),
-            position,
-            velocity,
         }
     }
 
@@ -62,8 +59,6 @@ impl ParticleType {
 #[derive(Component, Clone, Copy)]
 pub struct Particle {
     __type: ParticleType,
-    pub position: IVec2,
-    pub velocity: IVec2,
 }
 
 impl Particle {
@@ -77,36 +72,11 @@ impl Particle {
                         anchor: Anchor::BottomLeft,
                         ..default()
                     },
-                    transform: Transform::from_translation(self.as_vec3_position()),
+                    // transform: Transform::from_translation(self.as_vec3_position()),
                     ..default()
                 },
                 *self,
             ))
             .id()
-    }
-
-    pub fn in_chunk_index(&self) -> usize {
-        Self::in_chunk_index_position(self.position)
-    }
-
-    pub fn as_vec2_position(&self) -> Vec2 {
-        self.position.as_vec2()
-    }
-
-    pub fn as_vec2_velocity(&self) -> Vec2 {
-        self.velocity.as_vec2()
-    }
-
-    pub fn as_vec3_position(&self) -> Vec3 {
-        self.as_vec2_position().extend(0.0)
-    }
-
-    pub fn as_vec3_velocity(&self) -> Vec3 {
-        self.as_vec2_velocity().extend(0.0)
-    }
-
-    pub fn in_chunk_index_position(position: IVec2) -> usize {
-        let index = position.rem_euclid(IVec2::splat(CHUNK_SIZE as i32));
-        index.x as usize * CHUNK_SIZE + index.y as usize
     }
 }
