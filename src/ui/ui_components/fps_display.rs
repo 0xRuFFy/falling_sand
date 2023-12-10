@@ -30,8 +30,8 @@ pub fn setup(commands: &mut Commands) {
         }
         .with_style(Style {
             position_type: PositionType::Absolute,
-            bottom: Val::Px(8.),
-            right: Val::Px(40.),
+            top: Val::Px(8.),
+            left: Val::Px(8.),
             ..default()
         }),
         FpsDisplay,

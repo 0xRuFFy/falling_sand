@@ -2,21 +2,24 @@ mod events;
 mod resources;
 mod systems;
 
-mod particles;
-mod world;
+mod particle;
+pub mod world;
 
-use self::events::{spawn_particle, SpawnParticleEvent};
-use self::systems::{fixed_update, setup, spawn_particle_mouse, update};
+use self::events::{DespawnParticleEvent, SpawnParticleEvent};
 use bevy::prelude::*;
+use systems::*;
 
 pub struct FallingSandPlugin;
 
 impl Plugin for FallingSandPlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<SpawnParticleEvent>()
+            .add_event::<DespawnParticleEvent>()
             .add_systems(Startup, setup)
-            .add_systems(PreUpdate, (spawn_particle_mouse, spawn_particle).chain())
-            .add_systems(Update, update)
+            .add_systems(
+                PreUpdate,
+                (mouse_input, (spawn_particle, despawn_particle)).chain(),
+            )
             .add_systems(FixedUpdate, fixed_update);
     }
 }
