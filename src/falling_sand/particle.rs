@@ -1,3 +1,4 @@
+use super::world;
 use crate::utils::VecTransform;
 use bevy::prelude::*;
 use bevy::sprite::Anchor;
@@ -31,7 +32,10 @@ const SAND_MOVEMENT: PMovement = &[
     MovementOptionGroup(&[IVec2::new(1, -1), IVec2::new(-1, -1)]),
 ];
 
-#[derive(Clone, Copy)]
+#[derive(Component)]
+pub struct ParticleTag;
+
+#[derive(Debug, Clone, Copy)]
 pub enum ParticleType {
     Sand,
 }
@@ -41,16 +45,19 @@ impl ParticleType {
         Particle {
             __type: self,
             __id: commands
-                .spawn(SpriteBundle {
-                    sprite: Sprite {
-                        color: *self.color().unwrap_or(DEFAULT_COLOR),
-                        custom_size: Some(PARTICLE_SIZE),
-                        anchor: Anchor::BottomLeft,
+                .spawn((
+                    SpriteBundle {
+                        sprite: Sprite {
+                            color: *self.color().unwrap_or(DEFAULT_COLOR),
+                            custom_size: Some(PARTICLE_SIZE),
+                            anchor: Anchor::BottomLeft,
+                            ..default()
+                        },
+                        transform: Transform::from_translation(position.as_vec3()),
                         ..default()
                     },
-                    transform: Transform::from_translation(position.as_vec3()),
-                    ..default()
-                })
+                    ParticleTag,
+                ))
                 .id(),
             position,
         }
@@ -70,6 +77,7 @@ impl ParticleType {
     }
 }
 
+#[derive(Debug)]
 pub struct Particle {
     __type: ParticleType,
     __id: Entity,
@@ -79,5 +87,22 @@ pub struct Particle {
 impl Particle {
     pub fn id(&self) -> &Entity {
         &self.__id
+    }
+
+    pub fn movement(&self, world: &world::World) -> Option<IVec2> {
+        if let Some(groups) = self.__type.movement() {
+            for group in groups {
+                let shuffled = group.shuffled();
+                for offset in shuffled {
+                    let new_position = self.position + offset;
+                    if !world.empty_at(new_position) {
+                        return Some(new_position);
+                    }
+                    // return Some(new_position);
+                }
+            }
+        }
+
+        None
     }
 }

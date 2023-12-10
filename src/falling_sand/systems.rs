@@ -1,4 +1,5 @@
 use super::events::{DespawnParticleEvent, SpawnParticleEvent};
+use super::particle::ParticleTag;
 use super::resources::CurrentParticleType;
 use super::world::World;
 use crate::systems::PIXELS_PER_UNIT;
@@ -11,8 +12,8 @@ pub fn setup(mut commands: Commands) {
     commands.insert_resource(Time::<Fixed>::from_seconds(0.016));
 }
 
-pub fn fixed_update() {
-    // TODO
+pub fn fixed_update(mut world: ResMut<World>, mut query: Query<&mut Transform, With<ParticleTag>>) {
+    world.update(&mut query);
 }
 
 pub fn spawn_particle(
