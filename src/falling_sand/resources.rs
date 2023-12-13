@@ -76,3 +76,37 @@ impl Default for ParticleBrush {
         }
     }
 }
+
+#[derive(Resource)]
+pub struct SpawnTimer {
+    timer: f32,
+    guard: bool,
+    delay: f32,
+}
+
+impl SpawnTimer {
+    pub fn new(delay: f32) -> Self {
+        Self {
+            timer: 0.0,
+            guard: false,
+            delay,
+        }
+    }
+
+    pub fn tick(&mut self, time: Res<Time>) {
+        self.timer += time.delta_seconds();
+        if self.timer >= self.delay {
+            self.guard = true;
+            self.timer = 0.0;
+        }
+    }
+
+    pub fn guard(&mut self) -> bool {
+        if self.guard {
+            self.timer = 0.0;
+            self.guard = false;
+            return true;
+        }
+        false
+    }
+}

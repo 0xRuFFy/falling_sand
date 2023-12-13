@@ -1,6 +1,6 @@
 use super::events::{DespawnParticleEvent, SpawnParticleEvent};
 use super::particle::{ParticleTag, ParticleType};
-use super::resources::{CurrentParticleType, ParticleBrush};
+use super::resources::{CurrentParticleType, ParticleBrush, SpawnTimer};
 use super::world::World;
 use crate::systems::PIXELS_PER_UNIT;
 use bevy::prelude::*;
@@ -11,6 +11,11 @@ pub fn setup(mut commands: Commands) {
     commands.insert_resource(CurrentParticleType::default());
     commands.insert_resource(Time::<Fixed>::from_seconds(0.016));
     commands.insert_resource(ParticleBrush::default());
+    commands.insert_resource(SpawnTimer::new(0.08));
+}
+
+pub fn update(mut spawn_timer: ResMut<SpawnTimer>, time: Res<Time>) {
+    spawn_timer.tick(time)
 }
 
 pub fn fixed_update(mut world: ResMut<World>, mut query: Query<&mut Transform, With<ParticleTag>>) {
@@ -21,9 +26,13 @@ pub fn spawn_particle(
     mut commands: Commands,
     mut events: EventReader<SpawnParticleEvent>,
     mut world: ResMut<World>,
+    mut spawn_timer: ResMut<SpawnTimer>,
     __type: Res<CurrentParticleType>,
     brush: Res<ParticleBrush>,
 ) {
+    if !spawn_timer.guard() {
+        return;
+    }
     for event in events.read() {
         for offset in brush.get() {
             world.insert(&mut commands, &__type, event.position + *offset);

@@ -24,6 +24,7 @@ impl Plugin for FallingSandPlugin {
                 )
                     .chain(),
             )
+            .add_systems(Update, update)
             .add_systems(FixedUpdate, fixed_update);
     }
 }
