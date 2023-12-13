@@ -5,7 +5,7 @@ use bevy::sprite::Anchor;
 use rand::prelude::SliceRandom;
 
 const PARTICLE_SIZE: Vec2 = Vec2::new(1.0, 1.0);
-const SLEEP_TIMER: u8 = 25;
+const SLEEP_TIMER: u8 = 50;
 
 type PColor = &'static [Color];
 const DEFAULT_COLOR: &Color = &Color::rgb(0.0, 0.0, 0.0);
@@ -15,6 +15,13 @@ const SAND_COLOR: PColor = &[
     Color::rgb(0.925, 0.8, 0.635),
     Color::rgb(0.906, 0.769, 0.588),
     Color::rgb(0.882, 0.749, 0.573),
+];
+const WATER_COLOR: PColor = &[
+    Color::rgb(0.0, 0.624, 0.784),
+    Color::rgb(0.0, 0.671, 0.843),
+    Color::rgb(0.0, 0.71, 0.894),
+    Color::rgb(0.122, 0.757, 0.918),
+    Color::rgb(0.224, 0.816, 0.969),
 ];
 
 struct MovementOptionGroup(&'static [IVec2]);
@@ -32,6 +39,10 @@ const SAND_MOVEMENT: PMovement = &[
     MovementOptionGroup(&[IVec2::new(0, -1)]),
     MovementOptionGroup(&[IVec2::new(1, -1), IVec2::new(-1, -1)]),
 ];
+const WATER_MOVEMENT: PMovement = &[
+    MovementOptionGroup(&[IVec2::new(0, -1)]),
+    MovementOptionGroup(&[IVec2::new(1, 0), IVec2::new(-1, 0)]),
+];
 
 #[derive(Component)]
 pub struct ParticleTag;
@@ -39,6 +50,7 @@ pub struct ParticleTag;
 #[derive(Debug, Clone, Copy)]
 pub enum ParticleType {
     Sand,
+    Water,
 }
 
 impl ParticleType {
@@ -68,6 +80,7 @@ impl ParticleType {
     fn color(&self) -> Option<&Color> {
         match self {
             ParticleType::Sand => SAND_COLOR,
+            ParticleType::Water => WATER_COLOR,
         }
         .choose(&mut rand::thread_rng())
     }
@@ -75,6 +88,7 @@ impl ParticleType {
     fn movement(&self) -> Option<PMovement> {
         Some(match self {
             ParticleType::Sand => SAND_MOVEMENT,
+            ParticleType::Water => WATER_MOVEMENT,
         })
     }
 }
