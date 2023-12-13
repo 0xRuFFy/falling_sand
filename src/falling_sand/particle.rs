@@ -5,6 +5,7 @@ use bevy::sprite::Anchor;
 use rand::prelude::SliceRandom;
 
 const PARTICLE_SIZE: Vec2 = Vec2::new(1.0, 1.0);
+const SLEEP_TIMER: u8 = 25;
 
 type PColor = &'static [Color];
 const DEFAULT_COLOR: &Color = &Color::rgb(0.0, 0.0, 0.0);
@@ -59,6 +60,7 @@ impl ParticleType {
                     ParticleTag,
                 ))
                 .id(),
+            sleep_counter: SLEEP_TIMER,
             position,
         }
     }
@@ -77,10 +79,11 @@ impl ParticleType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub struct Particle {
     __type: ParticleType,
     __id: Entity,
+    sleep_counter: u8,
     pub position: IVec2,
 }
 
@@ -89,16 +92,27 @@ impl Particle {
         &self.__id
     }
 
+    pub fn asleep(&self) -> bool {
+        self.sleep_counter == 0
+    }
+
+    pub fn sleep(&mut self) {
+        self.sleep_counter = self.sleep_counter.saturating_sub(1);
+    }
+
+    pub fn wake(&mut self) {
+        self.sleep_counter = SLEEP_TIMER;
+    }
+
     pub fn movement(&self, world: &world::World) -> Option<IVec2> {
         if let Some(groups) = self.__type.movement() {
             for group in groups {
                 let shuffled = group.shuffled();
                 for offset in shuffled {
                     let new_position = self.position + offset;
-                    if !world.empty_at(new_position) {
+                    if world.empty_at(new_position) {
                         return Some(new_position);
                     }
-                    // return Some(new_position);
                 }
             }
         }
