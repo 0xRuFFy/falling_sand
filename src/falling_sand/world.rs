@@ -6,6 +6,7 @@ use bevy::utils::{HashMap, HashSet};
 use rand::seq::SliceRandom;
 
 // pub const CHUNK_SIZE: usize = 16;
+const GRAVITY: f32 = -0.25;
 const NEIGHBORS: [IVec2; 8] = [
     IVec2::new(0, 1),
     IVec2::new(0, -1),
@@ -92,6 +93,7 @@ impl World {
     }
 
     pub fn update(&mut self, query: &mut Query<&mut Transform, With<ParticleTag>>) {
+        // TODO: FIX SLEEPING WATER
         let mut rng = rand::thread_rng();
         let mut count = 0;
 
@@ -107,6 +109,7 @@ impl World {
             .iter_mut()
             .fold(HashMap::<IVec2, Vec<Entity>>::new(), |mut map, id| {
                 count += 1;
+                self.particles.get_mut(id).unwrap().accelerate(GRAVITY);
                 if let Some(new_position) = self.particles.get(id).unwrap().movement(self) {
                     map.entry(new_position).or_insert_with(Vec::new).push(*id);
                     self.particles.get_mut(id).unwrap().wake();
@@ -130,6 +133,6 @@ impl World {
                 }
             });
 
-        println!("Particles: {}/{}", count, self.particles.len());
+        // println!("Particles: {}/{}", count, self.particles.len());
     }
 }
