@@ -18,6 +18,7 @@ const NEIGHBORS: [IVec2; 8] = [
     IVec2::new(-1, -1),
 ];
 
+// TODO: IMPLEMENT CHUNKING FOR SPEEDUP
 #[derive(Resource, Debug)]
 pub struct World {
     entities: Vec<Entity>,
