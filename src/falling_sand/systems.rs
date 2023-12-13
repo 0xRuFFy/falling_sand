@@ -1,6 +1,6 @@
 use super::events::{DespawnParticleEvent, SpawnParticleEvent};
 use super::particle::ParticleTag;
-use super::resources::CurrentParticleType;
+use super::resources::{CurrentParticleType, ParticleBrush};
 use super::world::World;
 use crate::systems::PIXELS_PER_UNIT;
 use bevy::prelude::*;
@@ -10,6 +10,7 @@ pub fn setup(mut commands: Commands) {
     commands.insert_resource(World::new());
     commands.insert_resource(CurrentParticleType::default());
     commands.insert_resource(Time::<Fixed>::from_seconds(0.016));
+    commands.insert_resource(ParticleBrush::default());
 }
 
 pub fn fixed_update(mut world: ResMut<World>, mut query: Query<&mut Transform, With<ParticleTag>>) {
@@ -21,9 +22,12 @@ pub fn spawn_particle(
     mut events: EventReader<SpawnParticleEvent>,
     mut world: ResMut<World>,
     __type: Res<CurrentParticleType>,
+    brush: Res<ParticleBrush>,
 ) {
     for event in events.read() {
-        world.insert(&mut commands, &__type, event.position);
+        for offset in brush.get() {
+            world.insert(&mut commands, &__type, event.position + *offset);
+        }
     }
 }
 
@@ -54,9 +58,9 @@ pub fn mouse_input(
                 (window.height() - position.y) as i32 / PIXELS_PER_UNIT as i32,
             );
 
-            if mouse_button_input.pressed(MouseButton::Left) {
+            if mouse_button_input.just_pressed(MouseButton::Left) {
                 spawn_events.send(SpawnParticleEvent::new(position));
-            } else if mouse_button_input.pressed(MouseButton::Right) {
+            } else if mouse_button_input.just_pressed(MouseButton::Right) {
                 despawn_events.send(DespawnParticleEvent::new(position));
             }
         }
