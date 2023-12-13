@@ -1,5 +1,5 @@
 use super::events::{DespawnParticleEvent, SpawnParticleEvent};
-use super::particle::ParticleTag;
+use super::particle::{ParticleTag, ParticleType};
 use super::resources::{CurrentParticleType, ParticleBrush};
 use super::world::World;
 use crate::systems::PIXELS_PER_UNIT;
@@ -58,11 +58,29 @@ pub fn mouse_input(
                 (window.height() - position.y) as i32 / PIXELS_PER_UNIT as i32,
             );
 
-            if mouse_button_input.just_pressed(MouseButton::Left) {
+            if mouse_button_input.pressed(MouseButton::Left) {
                 spawn_events.send(SpawnParticleEvent::new(position));
-            } else if mouse_button_input.just_pressed(MouseButton::Right) {
+            } else if mouse_button_input.pressed(MouseButton::Right) {
                 despawn_events.send(DespawnParticleEvent::new(position));
             }
         }
+    }
+}
+
+pub fn keyboard_input(
+    mut brush: ResMut<ParticleBrush>,
+    mut current_type: ResMut<CurrentParticleType>,
+    keyboard_input: Res<Input<KeyCode>>,
+) {
+    if keyboard_input.just_pressed(KeyCode::Minus) {
+        brush.decrease();
+    } else if keyboard_input.just_pressed(KeyCode::Plus) {
+        brush.increase();
+    }
+
+    if keyboard_input.just_pressed(KeyCode::Key1) {
+        current_type.0 = ParticleType::Sand;
+    } else if keyboard_input.just_pressed(KeyCode::Key2) {
+        current_type.0 = ParticleType::Water;
     }
 }

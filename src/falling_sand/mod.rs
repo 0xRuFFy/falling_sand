@@ -18,7 +18,11 @@ impl Plugin for FallingSandPlugin {
             .add_systems(Startup, setup)
             .add_systems(
                 PreUpdate,
-                (mouse_input, (spawn_particle, despawn_particle)).chain(),
+                (
+                    (mouse_input, keyboard_input),
+                    (spawn_particle, despawn_particle),
+                )
+                    .chain(),
             )
             .add_systems(FixedUpdate, fixed_update);
     }

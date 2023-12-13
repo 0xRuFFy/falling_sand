@@ -45,7 +45,10 @@ const BRUSH_MEDIUM: PBrush = &[
 ];
 
 #[derive(Resource)]
-pub struct ParticleBrush(PBrush);
+pub struct ParticleBrush {
+    __id: usize,
+    brushes: Vec<PBrush>,
+}
 
 impl ParticleBrush {
     // pub fn use_medium(&mut self) {
@@ -53,13 +56,23 @@ impl ParticleBrush {
     // }
 
     pub fn get(&self) -> PBrush {
-        self.0
+        self.brushes[self.__id]
+    }
+
+    pub fn increase(&mut self) {
+        self.__id = (self.__id + 1).min(self.brushes.len() - 1);
+    }
+
+    pub fn decrease(&mut self) {
+        self.__id = (self.__id - 1).max(0);
     }
 }
 
 impl Default for ParticleBrush {
     fn default() -> Self {
-        // Self(BRUSH_DOT)
-        Self(BRUSH_MEDIUM)
+        Self {
+            __id: 0,
+            brushes: vec![BRUSH_DOT, BRUSH_MEDIUM],
+        }
     }
 }
